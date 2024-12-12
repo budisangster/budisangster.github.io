@@ -516,6 +516,11 @@ body {
     font-weight: bold;
     position: relative;
     color: transparent;
+    height: auto;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Doge */
@@ -562,7 +567,8 @@ body {
     content: 'فائز';
     position: absolute;
     left: 0;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     width: 100%;
     height: 100px;
     color: var(--accent-color);
@@ -591,7 +597,8 @@ body {
     content: 'فائز';
     position: absolute;
     left: 0;
-    top: 0;
+    top: 50%;
+    transform: translateY(-50%);
     width: 100%;
     height: 100px;
     color: var(--accent-color);
@@ -681,6 +688,7 @@ body {
     }
     .arabic-logo {
         font-size: 70px;
+        min-height: 90px;
     }
     .arabic-logo::before,
     .arabic-logo::after {
@@ -688,6 +696,14 @@ body {
     }
     .arabic-logo span {
         font-size: 24px;
+    }
+    
+    .logo-container {
+        padding: 20px 10px;
+        min-height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 } 
 
