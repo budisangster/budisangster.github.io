@@ -521,6 +521,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: -30px;
 }
 
 /* Doge */
@@ -580,7 +581,7 @@ body {
 .arabic-logo span {
     position: absolute;
     left: 65%;
-    top: 90%;
+    top: 75%;
     transform: translate(-50%, -50%);
     font-size: 30px;
     font-weight: normal;
@@ -689,6 +690,7 @@ body {
     .arabic-logo {
         font-size: 70px;
         min-height: 90px;
+        margin-top: -20px;
     }
     .arabic-logo::before,
     .arabic-logo::after {
@@ -696,6 +698,7 @@ body {
     }
     .arabic-logo span {
         font-size: 24px;
+        top: 70%;
     }
     
     .logo-container {
