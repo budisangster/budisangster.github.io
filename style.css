@@ -50,6 +50,11 @@ body {
     background: rgba(0,0,0,0.95);
 }
 
+.navbar.scrolled .nav-links a,
+.navbar.scrolled .logo {
+    color: #fff !important;
+}
+
 .logo {
     font-size: 24px;
     font-weight: 900;
@@ -128,6 +133,25 @@ body {
 
     .nav-toggle.active span:nth-child(3) {
         transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    /* Update mobile menu colors for light theme */
+    [data-theme="light"] .nav-links {
+        background: var(--overlay-bg);
+    }
+    
+    [data-theme="light"] .nav-links a {
+        color: var(--text-color);
+    }
+    
+    /* Force white text when scrolled in mobile */
+    .navbar.scrolled .nav-links a {
+        color: #fff !important;
+    }
+    
+    /* Update mobile menu background when scrolled */
+    .navbar.scrolled .nav-links {
+        background: rgba(0, 0, 0, 0.95);
     }
 }
 
@@ -578,19 +602,19 @@ body {
 }
 
 /* Add separate element for uhuy text */
-.arabic-logo span {
+.arabic-logo .subtitle {
     position: absolute;
     left: 65%;
-    top: 75%;
+    top: 85%;
     transform: translate(-50%, -50%);
     font-size: 30px;
     font-weight: normal;
     color: var(--accent-color);
     opacity: 0;
-    animation: textAppear 6s infinite;
     font-family: Arial, sans-serif;
     letter-spacing: 2px;
     z-index: 3;
+    animation: textAppear 6s infinite;
 }
 
 /* Bottom half */
@@ -696,9 +720,8 @@ body {
     .arabic-logo::after {
         height: 70px;
     }
-    .arabic-logo span {
+    .arabic-logo .subtitle {
         font-size: 24px;
-        top: 70%;
     }
     
     .logo-container {
@@ -710,23 +733,33 @@ body {
     }
 } 
 
-/* Add theme toggle button styles */
+/* Update theme toggle styles */
+.theme-toggle-wrapper {
+    --toggle-right: 350px;     /* Adjust this to move left/right */
+    --toggle-top: 50%;        /* Adjust this to move up/down */
+    --toggle-margin: 20px;    /* Adjust spacing */
+    
+    position: absolute;
+    right: var(--toggle-right);
+    top: var(--toggle-top);
+    transform: translateY(-50%);
+    margin: 0;
+    padding: 0;
+}
+
 .theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
     padding: 8px;
     background: var(--accent-color);
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    z-index: 999;
     width: 35px;
     height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease;
+    margin-right: var(--toggle-margin);
 }
 
 .theme-toggle:hover {
@@ -734,22 +767,24 @@ body {
 }
 
 .theme-toggle i {
-    font-size: 16px;
     color: var(--bg-color);
+    font-size: 16px;
 }
 
 @media (max-width: 768px) {
-    .theme-toggle {
-        top: 18px;
-        right: 70px;
-        width: 30px;
-        height: 30px;
+    .theme-toggle-wrapper {
+        --toggle-right: 60px;  /* Mobile position */
+        --toggle-margin: 0;
     }
+}
 
-    .theme-toggle i {
-        font-size: 14px;
+/* Add responsive positioning for mobile */
+@media (max-width: 768px) {
+    .theme-toggle {
+        right: 70px;
+        top: 17px;
     }
-} 
+}
 
 /* Add this to your existing styles */
 [data-theme="light"] .navbar.scrolled {
@@ -790,4 +825,56 @@ body {
 
 .zoomed-image.active {
     transform: scale(1);
+} 
+
+/* Countdown styles */
+.countdown {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 40px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards 0.5s;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+}
+
+.countdown-item span {
+    color: var(--accent-color);
+    font-size: 40px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.countdown-item .label {
+    color: var(--text-color);
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-top: 8px;
+    opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+    .countdown {
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .countdown-item {
+        min-width: 60px;
+    }
+
+    .countdown-item span {
+        font-size: 30px;
+    }
+
+    .countdown-item .label {
+        font-size: 10px;
+    }
 } 
