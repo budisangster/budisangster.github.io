@@ -50,11 +50,23 @@ class MessagesManager {
 
     async replyToMessage(messageId, reply) {
         try {
+            // Find the original message
+            const message = this.messages.find(m => m.key === messageId);
+            if (!message) {
+                throw new Error('Message not found');
+            }
+
+            // Create updated message with reply
+            const updatedMessage = {
+                type: message.type,
+                content: message.content,
+                timestamp: message.timestamp,
+                reply: reply
+            };
+
+            // Update in Firebase
             const messageRef = ref(database, `messages/${messageId}`);
-            await set(messageRef, {
-                ...this.messages.find(m => m.id === messageId),
-                reply
-            });
+            await set(messageRef, updatedMessage);
             return true;
         } catch (error) {
             console.error('Error replying to message:', error);
@@ -260,7 +272,7 @@ class MessageUI {
     createMessageBubble(message) {
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
-        bubble.dataset.messageId = message.key || message.timestamp;
+        bubble.dataset.messageId = message.key;
         const hasReply = message.reply && message.reply.trim() !== '';
         
         bubble.innerHTML = `
@@ -283,10 +295,10 @@ class MessageUI {
             ${this.isAdmin ? `
                 <div class="admin-controls">
                     <textarea class="reply-input" placeholder="Ketik balasan disini..."></textarea>
-                    <button class="reply-button" onclick="window.messageUI.replyToMessage('${message.key || message.timestamp}')">
+                    <button class="reply-button" onclick="window.messageUI.replyToMessage('${message.key}')">
                         <i class="fas fa-reply"></i> Balas
                     </button>
-                    <button class="delete-button" onclick="window.messageUI.deleteMessage('${message.key || message.timestamp}')">
+                    <button class="delete-button" onclick="window.messageUI.deleteMessage('${message.key}')">
                         <i class="fas fa-trash"></i> Hapus
                     </button>
                 </div>
@@ -334,21 +346,17 @@ class MessageUI {
                 return;
             }
 
-            // Find the message in our data
-            const message = this.manager.messages.find(m => (m.key || m.timestamp) === messageId);
-            if (!message) {
-                console.error('Message not found in data');
-                return;
-            }
-
             // Save the reply
-            await this.manager.replyToMessage(messageId, reply);
+            const success = await this.manager.replyToMessage(messageId, reply);
             
-            // Clear the input
-            replyInput.value = '';
-            
-            // Show success feedback
-            alert('Balasan terkirim! ✨');
+            if (success) {
+                // Clear the input
+                replyInput.value = '';
+                // Show success feedback
+                alert('Balasan terkirim! ✨');
+            } else {
+                throw new Error('Failed to save reply');
+            }
         } catch (error) {
             console.error('Error replying to message:', error);
             alert('Gagal mengirim balasan. Coba lagi ya!');
@@ -458,10 +466,12 @@ class MessageUI {
             }
 
             .message-reply {
-                background: rgba(246, 178, 47, 0.1);
+                background: var(--bg-color);
                 border-radius: 15px;
                 padding: 15px;
-                margin-top: 10px;
+                margin-top: 15px;
+                border-left: 4px solid var(--accent-color);
+                position: relative;
             }
 
             .reply-header {
@@ -474,14 +484,21 @@ class MessageUI {
                 gap: 5px;
             }
 
+            .reply-header i {
+                font-size: 12px;
+            }
+
             .reply-content {
                 color: var(--text-color);
                 font-size: 14px;
                 line-height: 1.5;
+                padding-left: 10px;
             }
 
             .admin-controls {
                 margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid rgba(246, 178, 47, 0.2);
                 display: flex;
                 gap: 10px;
                 flex-wrap: wrap;
@@ -497,6 +514,14 @@ class MessageUI {
                 font-size: 14px;
                 resize: vertical;
                 min-height: 60px;
+                border: 1px solid rgba(246, 178, 47, 0.2);
+                transition: all 0.3s ease;
+            }
+
+            .reply-input:focus {
+                outline: none;
+                border-color: var(--accent-color);
+                box-shadow: 0 0 10px rgba(246, 178, 47, 0.1);
             }
 
             .reply-button, .delete-button {
