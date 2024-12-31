@@ -276,8 +276,18 @@ class MessageUI {
                 <div class="message-reply">
                     <div class="reply-header">
                         <i class="fas fa-reply"></i> Reply from Faiz
+                        ${this.isAdmin ? `
+                            <div class="reply-actions">
+                                <button onclick="window.messageUI.editReply('${message.key}')" class="edit-reply-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="window.messageUI.removeReply('${message.key}')" class="remove-reply-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
-                    <div class="reply-content">${this.formatMessageContent(message.reply)}</div>
+                    <div class="reply-content" id="reply-${message.key}">${this.formatMessageContent(message.reply)}</div>
                 </div>
             ` : ''}
             ${this.isAdmin ? `
@@ -360,6 +370,68 @@ class MessageUI {
         } catch (error) {
             console.error('Error deleting message:', error);
             alert('Gagal menghapus pesan. Coba lagi ya!');
+        }
+    }
+
+    async editReply(messageId) {
+        try {
+            // Find the message
+            const message = this.manager.messages.find(m => m.key === messageId);
+            if (!message || !message.reply) {
+                throw new Error('Reply not found');
+            }
+
+            // Prompt for new reply text
+            const newReply = prompt('Edit reply:', message.reply);
+            if (newReply === null) return; // User cancelled
+            if (!newReply.trim()) {
+                alert('Reply cannot be empty!');
+                return;
+            }
+
+            // Update the message with new reply
+            const updatedMessage = {
+                type: message.type,
+                content: message.content,
+                timestamp: message.timestamp,
+                reply: newReply.trim()
+            };
+
+            // Save to Firebase
+            const messageRef = ref(database, `messages/${messageId}`);
+            await set(messageRef, updatedMessage);
+            alert('Reply updated! ✨');
+        } catch (error) {
+            console.error('Error editing reply:', error);
+            alert('Failed to update reply. Try again!');
+        }
+    }
+
+    async removeReply(messageId) {
+        try {
+            if (!confirm('Are you sure you want to remove this reply?')) return;
+
+            // Find the message
+            const message = this.manager.messages.find(m => m.key === messageId);
+            if (!message) {
+                throw new Error('Message not found');
+            }
+
+            // Update message without reply
+            const updatedMessage = {
+                type: message.type,
+                content: message.content,
+                timestamp: message.timestamp
+                // Omit reply field to remove it
+            };
+
+            // Save to Firebase
+            const messageRef = ref(database, `messages/${messageId}`);
+            await set(messageRef, updatedMessage);
+            alert('Reply removed! ✨');
+        } catch (error) {
+            console.error('Error removing reply:', error);
+            alert('Failed to remove reply. Try again!');
         }
     }
 
@@ -469,6 +541,7 @@ class MessageUI {
                 margin-bottom: 8px;
                 display: flex;
                 align-items: center;
+                justify-content: space-between;
                 gap: 5px;
             }
 
@@ -543,6 +616,31 @@ class MessageUI {
                 font-size: 12px;
                 color: var(--text-color);
                 opacity: 0.7;
+            }
+
+            .reply-actions {
+                display: flex;
+                gap: 5px;
+            }
+
+            .edit-reply-btn, .remove-reply-btn {
+                background: none;
+                border: none;
+                color: var(--text-color);
+                opacity: 0.6;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 4px;
+                transition: all 0.3s ease;
+            }
+
+            .edit-reply-btn:hover, .remove-reply-btn:hover {
+                opacity: 1;
+                background: rgba(246, 178, 47, 0.1);
+            }
+
+            .remove-reply-btn:hover {
+                color: #ff4444;
             }
         `;
         document.head.appendChild(style);
