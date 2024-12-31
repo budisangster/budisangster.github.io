@@ -120,42 +120,24 @@ class MessageUI {
         this.setupEventListeners();
         this.updateMessageCount();
         this.startAutoUpdate();
-        this.checkAdmin();
+        this.checkAdminHash();
         this.addStyles();
         // Make messageUI globally accessible
         window.messageUI = this;
     }
 
-    checkAdmin() {
-        // Check if admin password is stored
-        const storedHash = localStorage.getItem('adminHash');
-        if (!storedHash) {
-            this.isAdmin = false;
-            return;
-        }
-
-        // Verify the stored hash
-        const correctHash = 'f4c3b00k'; // Replace with your actual hash
-        this.isAdmin = storedHash === correctHash;
-    }
-
-    async login(password) {
-        // Simple hash for demo (replace with proper hashing in production)
-        const correctHash = 'f4c3b00k'; // Replace with your actual hash
+    checkAdminHash() {
+        // Check if the URL hash contains the admin code
+        const hash = window.location.hash;
+        const adminCode = 'admin123'; // Change this to your desired admin code
         
-        if (password === correctHash) {
-            localStorage.setItem('adminHash', correctHash);
+        if (hash === '#' + adminCode) {
             this.isAdmin = true;
-            this.displayMessages(); // Refresh messages to show admin controls
-            return true;
+            // Remove the admin code from URL
+            history.pushState("", document.title, window.location.pathname + window.location.search);
+        } else {
+            this.isAdmin = false;
         }
-        return false;
-    }
-
-    logout() {
-        localStorage.removeItem('adminHash');
-        this.isAdmin = false;
-        this.displayMessages(); // Refresh messages to hide admin controls
     }
 
     setupElements() {
@@ -167,27 +149,6 @@ class MessageUI {
         this.loadMoreButton.className = 'load-more-messages';
         this.loadMoreButton.innerHTML = 'Load More Messages';
         this.loadMoreButton.style.display = 'none';
-
-        // Add admin login button
-        this.adminButton = document.createElement('div');
-        this.adminButton.className = 'admin-login';
-        this.adminButton.innerHTML = this.isAdmin ? 'Logout' : 'Admin Login';
-        this.adminButton.onclick = () => this.handleAdminClick();
-        this.floatingMessages.appendChild(this.adminButton);
-    }
-
-    handleAdminClick() {
-        if (this.isAdmin) {
-            this.logout();
-            this.adminButton.innerHTML = 'Admin Login';
-        } else {
-            const password = prompt('Enter admin password:');
-            if (password && this.login(password)) {
-                this.adminButton.innerHTML = 'Logout';
-            } else {
-                alert('Invalid password');
-            }
-        }
     }
 
     setupEventListeners() {
