@@ -140,69 +140,60 @@ class MessageUI {
     setupAdminShortcut() {
         let keys = {};
         let lastKeyTime = 0;
-        const KEY_TIMEOUT = 500;
-        
-        // Obfuscated admin check
-        const _0xa=['6c','61']; // Obfuscated 'a' and 'l' keys
-        const _0xv=(k)=>String.fromCharCode(parseInt(k,16));
-        const _0xc=(k)=>k.toLowerCase()===_0xv(_0xa[0])||k.toLowerCase()===_0xv(_0xa[1]);
+        const KEY_TIMEOUT = 500; // 500ms timeout for key combination
 
         document.addEventListener('keydown', (e) => {
             const currentTime = Date.now();
             
+            // Reset keys if too much time has passed
             if (currentTime - lastKeyTime > KEY_TIMEOUT) {
                 keys = {};
             }
             lastKeyTime = currentTime;
 
-            if (_0xc(e.key)) {
-                keys[e.key.toLowerCase()] = true;
-            }
+            // Store the key state
+            keys[e.key.toLowerCase()] = true;
 
-            if (keys[_0xv(_0xa[1])] && keys[_0xv(_0xa[0])] && 
+            // Only trigger if both 'a' and 'l' are pressed together
+            // and we're not in a text input
+            if (keys['a'] && keys['l'] && 
                 !(document.activeElement.tagName === 'INPUT' || 
                   document.activeElement.tagName === 'TEXTAREA')) {
                 if (!this.isAdmin) {
                     this.isAdmin = true;
                     localStorage.setItem('adminData', JSON.stringify({
                         timestamp: Date.now(),
-                        level: btoa('FullAccess_' + Date.now()) // Obfuscated admin level
+                        level: 'Full Access'
                     }));
                     this.displayMessages();
                     alert('Admin mode activated! 👑✨');
                 } else {
                     this.exitAdmin();
                 }
+                // Prevent default to avoid typing 'al'
                 e.preventDefault();
             }
         });
 
         document.addEventListener('keyup', (e) => {
-            if (_0xc(e.key)) {
-                delete keys[e.key.toLowerCase()];
-            }
+            // Remove the released key from tracking
+            delete keys[e.key.toLowerCase()];
         });
 
+        // Clear keys when window loses focus
         window.addEventListener('blur', () => {
             keys = {};
         });
     }
 
     checkAdminStatus() {
-        try {
-            const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
-            const now = Date.now();
-            
-            if (adminData.timestamp && 
-                (now - adminData.timestamp) < 24 * 60 * 60 * 1000 && 
-                adminData.level && 
-                atob(adminData.level).startsWith('FullAccess_')) {
-                this.isAdmin = true;
-            } else {
-                this.isAdmin = false;
-                localStorage.removeItem('adminData');
-            }
-        } catch {
+        // Check if admin code is stored and still valid (24 hours)
+        const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+        const now = Date.now();
+        
+        if (adminData.timestamp && (now - adminData.timestamp) < 24 * 60 * 60 * 1000) {
+            this.isAdmin = true;
+        } else {
             this.isAdmin = false;
             localStorage.removeItem('adminData');
         }
