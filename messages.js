@@ -223,8 +223,8 @@ class MessageUI {
 
     getTypeIcon(type) {
         switch (type) {
-            case 'Question': return 'fa-question-circle';
-            case 'Confession': return 'fa-heart';
+            case 'Tanya Dong': return 'fa-question-circle';
+            case 'Spill Tea': return 'fa-coffee';
             case 'Feedback': return 'fa-comment';
             default: return 'fa-message';
         }
@@ -238,29 +238,17 @@ class MessageUI {
         return content;
     }
 
-    replyToMessage(timestamp) {
-        const messages = this.manager.loadFromLocalStorage() || [];
-        const messageIndex = messages.findIndex(m => m.timestamp.toString() === timestamp);
-        if (messageIndex === -1) return;
-
-        const replyInput = document.querySelector(`[data-timestamp="${timestamp}"] .reply-input`);
+    replyToMessage(messageId) {
+        const replyInput = document.querySelector(`[data-timestamp="${messageId}"] .reply-input`);
         const reply = replyInput.value.trim();
         if (!reply) return;
 
-        messages[messageIndex].reply = reply;
-        localStorage.setItem('messages', JSON.stringify(messages));
-        this.displayMessages();
+        this.manager.replyToMessage(messageId, reply);
     }
 
-    deleteMessage(timestamp) {
-        if (!confirm('Are you sure you want to delete this message?')) return;
-        
-        const messages = this.manager.loadFromLocalStorage() || [];
-        const newMessages = messages.filter(m => m.timestamp.toString() !== timestamp);
-        localStorage.setItem('messages', JSON.stringify(newMessages));
-        this.manager.messages = newMessages;
-        this.displayMessages();
-        this.updateMessageCount();
+    deleteMessage(messageId) {
+        if (!confirm('Yakin mau hapus pesan ini?')) return;
+        this.manager.deleteMessage(messageId);
     }
 
     // Add to your CSS in index.html
@@ -409,7 +397,6 @@ class MessageUI {
         this.floatingMessages.style.display = this.isMessagesVisible ? 'block' : 'none';
         
         if (this.isMessagesVisible) {
-            this.manager.messages = this.manager.loadFromLocalStorage() || [];
             this.displayMessages();
             if (this.messageCount) {
                 this.messageCount.style.display = 'none';

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUHAMMADFAIZ™ - Anonymous Message</title>
+    <title>MUHAMMADFAIZ™ - Free trade zone</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -195,39 +195,39 @@
     <!-- Message Form -->
     <div class="message-container">
         <form class="message-form" id="messageForm">
-            <h1>DROP YOUR MESSAGE ✨</h1>
+            <h1>KIRIM KIRIM</h1>
             
             <div class="message-type">
                 <label>
-                    <input type="radio" name="type" value="Question" checked>
-                    <span><i class="fas fa-question-circle"></i> Ask Me!</span>
+                    <input type="radio" name="type" value="Tanya Dong" checked>
+                    <span><i class="fas fa-question-circle"></i> AMA!</span>
                 </label>
-                <label>
-                    <input type="radio" name="type" value="Confession">
-                    <span><i class="fas fa-heart"></i> Confess!</span>
-                </label>
+                <!-- <label>
+                    <input type="radio" name="type" value="Spill Tea">
+                    <span><i class="fas fa-coffee"></i> Spill Tea!</span>
+                </label> -->
                 <label>
                     <input type="radio" name="type" value="Feedback">
                     <span><i class="fas fa-comment"></i> Feedback!</span>
                 </label>
             </div>
 
-            <div class="char-counter">0 / 500 characters</div>
-            <textarea name="message" placeholder="Spill the tea! Share your thoughts, questions, or anything on your mind... 🌟" required maxlength="500"></textarea>
+            <div class="char-counter">0 / 500 karakter</div>
+            <textarea name="message" placeholder="Kawasan bebas parkir.... hmu with eveyrthing" required maxlength="500"></textarea>
             
             <button type="submit">
-                SEND IT! <i class="fas fa-paper-plane"></i>
+                GAS KIRIM! <i class="fas fa-paper-plane"></i>
                 <i class="fas fa-spinner loading"></i>
             </button>
 
             <div class="success-message">
-                Message sent! Thanks for dropping by! 🎉✨ Happy New Year 2024! 🎊
+                Pesan terkirim! Makasih udah mampir! 🎉✨ Happy New Year 2024! 🎊
             </div>
             <div class="error-message">
-                Oops! Something's not right. Try again? 🙏
+                Waduh error nih! Coba lagi ya? 🙏
             </div>
 
-            <p class="message-info">Feel free to express yourself! Your message is anonymous and will be posted once I see it. Keep it fun and respectful! 💫</p>
+            <p class="message-info">Santuy, pesannya anonymous!</p>
         </form>
     </div>
 
@@ -259,13 +259,34 @@
     <script type="module">
         import { database, ref, push } from './firebase-config.js';
 
+        // Theme toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            body.classList.add(savedTheme);
+            icon.classList.toggle('fa-sun', savedTheme === 'light');
+            icon.classList.toggle('fa-moon', savedTheme === 'dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            icon.classList.toggle('fa-sun', !isDark);
+            icon.classList.toggle('fa-moon', isDark);
+        });
+
         // Character counter
         const textarea = document.querySelector('textarea');
         const charCounter = document.querySelector('.char-counter');
         
         textarea.addEventListener('input', function() {
             const remaining = this.value.length;
-            charCounter.textContent = `${remaining} / 500 characters`;
+            charCounter.textContent = `${remaining} / 500 karakter`;
         });
 
         // Form submission handling
@@ -305,7 +326,7 @@
             const content = textarea.value.trim();
 
             if (!content) {
-                errorMessage.textContent = 'Please enter a message';
+                errorMessage.textContent = 'Tulis pesan dulu dong!';
                 errorMessage.style.display = 'block';
                 submitButton.disabled = false;
                 loadingIcon.style.display = 'none';
@@ -317,7 +338,7 @@
                 // Show success message
                 successMessage.style.display = 'block';
                 form.reset();
-                charCounter.textContent = '0 / 500 characters';
+                charCounter.textContent = '0 / 500 karakter';
                 
                 // Redirect to index after 1 second
                 setTimeout(() => {
