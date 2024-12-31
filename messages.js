@@ -4,8 +4,6 @@ import { database, ref, onValue, push, set, remove } from './firebase-config.js'
 class MessagesManager {
     constructor() {
         this.messages = [];
-        this.pageSize = 3;
-        this.currentPage = 1;
         this.setupRealtimeSync();
         // Make manager globally accessible
         window.messagesManager = this;
@@ -15,7 +13,7 @@ class MessagesManager {
         const messagesRef = ref(database, 'messages');
         onValue(messagesRef, (snapshot) => {
             const data = snapshot.val();
-            // Convert object to array with keys
+            // Convert object to array with keys and sort by timestamp (newest first)
             this.messages = data ? Object.entries(data).map(([key, value]) => ({
                 ...value,
                 key
@@ -24,6 +22,8 @@ class MessagesManager {
             if (window.messageUI) {
                 window.messageUI.updateMessageCount();
                 if (window.messageUI.isMessagesVisible) {
+                    // Reset to first page when new data arrives
+                    this.currentPage = 1;
                     window.messageUI.displayMessages();
                 } else {
                     window.messageUI.showNewMessageNotification();
@@ -105,25 +105,18 @@ class MessagesManager {
     }
 
     getPagedMessages() {
-        const displayMessages = this.messages.map(msg => ({
+        // Return all messages with formatted time
+        return this.messages.map(msg => ({
             ...msg,
             time: this.formatTime(msg.timestamp)
         }));
-        
-        const start = (this.currentPage - 1) * this.pageSize;
-        const end = start + this.pageSize;
-        return displayMessages.slice(start, end);
     }
 
     hasMoreMessages() {
-        return this.currentPage * this.pageSize < this.messages.length;
+        return false;
     }
 
     loadMoreMessages() {
-        if (this.hasMoreMessages()) {
-            this.currentPage++;
-            return this.getPagedMessages();
-        }
         return [];
     }
 }
@@ -218,10 +211,6 @@ class MessageUI {
         this.floatingMessages = document.querySelector('.floating-messages');
         this.messageCount = document.querySelector('.message-count');
         this.noMessages = document.querySelector('.no-messages');
-        this.loadMoreButton = document.createElement('div');
-        this.loadMoreButton.className = 'load-more-messages';
-        this.loadMoreButton.innerHTML = 'Tampilkan Lebih Banyak';
-        this.loadMoreButton.style.display = 'none';
 
         // Add admin status indicator
         this.adminIndicator = document.createElement('div');
@@ -240,7 +229,6 @@ class MessageUI {
         if (!this.messagesToggle) return;
 
         this.messagesToggle.addEventListener('click', () => this.toggleMessages());
-        this.loadMoreButton.addEventListener('click', () => this.loadMore());
         
         document.addEventListener('click', (e) => {
             if (this.isMessagesVisible && 
@@ -577,7 +565,15 @@ class MessageUI {
     displayMessages() {
         if (!this.floatingMessages || !this.noMessages) return;
         
+        // Clear existing messages
         this.floatingMessages.innerHTML = '';
+
+        // Add admin indicator if needed
+        if (this.isAdmin) {
+            this.adminIndicator.innerHTML = '<div class="admin-status">👑 Admin Mode</div>';
+            this.floatingMessages.appendChild(this.adminIndicator);
+        }
+
         const messages = this.manager.getPagedMessages();
         
         if (messages.length === 0) {
@@ -592,31 +588,8 @@ class MessageUI {
             this.floatingMessages.appendChild(bubble);
             setTimeout(() => {
                 bubble.classList.add('show');
-            }, index * 200);
+            }, index * 100);
         });
-
-        if (this.manager.hasMoreMessages()) {
-            this.floatingMessages.appendChild(this.loadMoreButton);
-            this.loadMoreButton.style.display = 'block';
-        } else {
-            this.loadMoreButton.style.display = 'none';
-        }
-    }
-
-    loadMore() {
-        const newMessages = this.manager.loadMoreMessages();
-        newMessages.forEach((message, index) => {
-            const bubble = this.createMessageBubble(message);
-            bubble.style.opacity = '0';
-            this.floatingMessages.insertBefore(bubble, this.loadMoreButton);
-            setTimeout(() => {
-                bubble.classList.add('show');
-            }, index * 200);
-        });
-
-        if (!this.manager.hasMoreMessages()) {
-            this.loadMoreButton.style.display = 'none';
-        }
     }
 
     updateMessageCount() {
