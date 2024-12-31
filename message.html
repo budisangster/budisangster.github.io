@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MUHAMMADFAIZ™ - Anonymous Message</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .message-container {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 20px 40px;
+        }
+
+        .message-form {
+            max-width: 600px;
+            width: 100%;
+            background: var(--modal-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-form h1 {
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 4px;
+            font-weight: 900;
+        }
+
+        .message-form textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid var(--accent-color);
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+            resize: vertical;
+        }
+
+        .message-form button {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .message-form button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .message-info {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .char-counter {
+            text-align: right;
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .message-type {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .message-type label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .message-type input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .loading {
+            display: none;
+            margin-left: 10px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message, .error-message {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">MUHAMMADFAIZ™</div>
+        <ul class="nav-links">
+            <li class="theme-toggle-wrapper">
+                <div class="theme-toggle">
+                    <i class="fas fa-sun"></i>
+                </div>
+            </li>
+            <li><a href="index.html#home">HOME</a></li>
+            <li><a href="index.html#work">SHOWCASE</a></li>
+            <li><a href="index.html#footer">CONTACT</a></li>
+            <li><a href="message.html">MESSAGE</a></li>
+        </ul>
+        <div class="nav-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- Message Form -->
+    <div class="message-container">
+        <form class="message-form" id="messageForm">
+            <h1>SEND ANONYMOUS MESSAGE</h1>
+            
+            <div class="message-type">
+                <label>
+                    <input type="radio" name="type" value="Question" checked> Question
+                </label>
+                <label>
+                    <input type="radio" name="type" value="Confession"> Confession
+                </label>
+                <label>
+                    <input type="radio" name="type" value="Feedback"> Feedback
+                </label>
+            </div>
+
+            <div class="char-counter">0 / 500 characters</div>
+            <textarea name="message" placeholder="Type your message here... (max 500 characters)" required maxlength="500"></textarea>
+            
+            <button type="submit">
+                SEND MESSAGE
+                <i class="fas fa-spinner loading"></i>
+            </button>
+
+            <div class="success-message">
+                Message sent successfully! Happy new year🎉
+            </div>
+            <div class="error-message">
+                Oops! Something went wrong. Please try again later. 😔
+            </div>
+
+            <p class="message-info">Your message will be anonymous. Be kind and respectful!</p>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer" class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">MUHAMMADFAIZ™</div>
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/muhammad-faiz-61726424b/" target="_blank" class="footer-icon">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://instagram.com/faizmuhhh" target="_blank" class="footer-icon">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="mailto:muhammadfaiz.main@gmail.com" class="footer-icon">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                <a href="https://github.com/budisangster" target="_blank" class="footer-icon">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://steamcommunity.com/id/budisangster" target="_blank" class="footer-icon">
+                    <i class="fab fa-steam"></i>
+                </a>
+            </div>
+            <p class="footer-text">© 2024 MUHAMMADFAIZ™. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="messages.js"></script>
+    <script>
+        // Character counter
+        const textarea = document.querySelector('textarea');
+        const charCounter = document.querySelector('.char-counter');
+        
+        textarea.addEventListener('input', function() {
+            const remaining = this.value.length;
+            charCounter.textContent = `${remaining} / 500 characters`;
+        });
+
+        // Form submission handling
+        const form = document.getElementById('messageForm');
+        const submitButton = form.querySelector('button');
+        const loadingIcon = form.querySelector('.loading');
+        const successMessage = form.querySelector('.success-message');
+        const errorMessage = form.querySelector('.error-message');
+
+        function saveMessage(type, content) {
+            try {
+                // Get existing messages or create empty array
+                const messages = JSON.parse(localStorage.getItem('messages')) || [];
+                
+                // Add new message
+                const newMessage = {
+                    type: type,
+                    content: content,
+                    timestamp: new Date().getTime()
+                };
+                
+                // Add to beginning of array
+                messages.unshift(newMessage);
+                
+                // Save back to localStorage
+                localStorage.setItem('messages', JSON.stringify(messages));
+
+                // Force refresh messages in current window
+                if (window.messagesManager) {
+                    window.messagesManager.messages = messages;
+                    if (window.messageUI) {
+                        window.messageUI.updateMessageCount();
+                        window.messageUI.displayMessages();
+                    }
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('Error saving message:', error);
+                return false;
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            submitButton.disabled = true;
+            loadingIcon.style.display = 'inline-block';
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Get form data
+            const type = form.querySelector('input[name="type"]:checked').value;
+            const content = textarea.value.trim();
+
+            if (!content) {
+                errorMessage.textContent = 'Please enter a message';
+                errorMessage.style.display = 'block';
+                submitButton.disabled = false;
+                loadingIcon.style.display = 'none';
+                return;
+            }
+
+            // Save message
+            if (saveMessage(type, content)) {
+                // Show success message
+                successMessage.style.display = 'block';
+                form.reset();
+                charCounter.textContent = '0 / 500 characters';
+                
+                // Redirect to index after 1 second
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                    // Force show messages after redirect
+                    localStorage.setItem('showMessages', 'true');
+                }, 1000);
+            } else {
+                // Show error message
+                errorMessage.style.display = 'block';
+            }
+
+            // Reset button state
+            submitButton.disabled = false;
+            loadingIcon.style.display = 'none';
+        });
+
+        // Mobile navigation toggle
+        document.querySelector('.nav-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+    </script>
+</body>
+</html> 
