@@ -12,28 +12,10 @@ const firebaseConfig = {
     messagingSenderId: "713376875689",
     appId: "1:713376875689:web:31818e226826157b31d5b8",
     measurementId: "G-SB2SGWGSTJ"
-  };
+};
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-// Set up database rules (do this in Firebase Console)
-/*
-{
-  "rules": {
-    "messages": {
-      ".read": true,
-      ".write": true,
-      "$message": {
-        ".validate": "newData.hasChildren(['type', 'content', 'timestamp']) 
-          && newData.child('content').isString() 
-          && newData.child('content').val().length <= 500
-          && newData.child('type').isString()
-          && newData.child('timestamp').isNumber()"
-      }
-    }
-  }
-}
-*/
+const database = getDatabase(app);
 
 export { database, ref, onValue, push, set, remove }; 
