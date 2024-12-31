@@ -187,6 +187,7 @@ class MessageUI {
     createMessageBubble(message) {
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
+        bubble.dataset.messageId = message.key || message.timestamp;
         const hasReply = message.reply && message.reply.trim() !== '';
         
         bubble.innerHTML = `
@@ -208,12 +209,12 @@ class MessageUI {
             ` : ''}
             ${this.isAdmin ? `
                 <div class="admin-controls">
-                    <textarea class="reply-input" placeholder="Type your reply..."></textarea>
-                    <button class="reply-button" onclick="messageUI.replyToMessage('${message.timestamp}')">
-                        <i class="fas fa-reply"></i> Reply
+                    <textarea class="reply-input" placeholder="Ketik balasan disini..."></textarea>
+                    <button class="reply-button" onclick="window.messageUI.replyToMessage('${message.key || message.timestamp}')">
+                        <i class="fas fa-reply"></i> Balas
                     </button>
-                    <button class="delete-button" onclick="messageUI.deleteMessage('${message.timestamp}')">
-                        <i class="fas fa-trash"></i> Delete
+                    <button class="delete-button" onclick="window.messageUI.deleteMessage('${message.key || message.timestamp}')">
+                        <i class="fas fa-trash"></i> Hapus
                     </button>
                 </div>
             ` : ''}
@@ -238,17 +239,59 @@ class MessageUI {
         return content;
     }
 
-    replyToMessage(messageId) {
-        const replyInput = document.querySelector(`[data-timestamp="${messageId}"] .reply-input`);
-        const reply = replyInput.value.trim();
-        if (!reply) return;
+    async replyToMessage(messageId) {
+        try {
+            // Find the message bubble by ID
+            const messageBubble = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (!messageBubble) {
+                console.error('Message bubble not found');
+                return;
+            }
 
-        this.manager.replyToMessage(messageId, reply);
+            // Find the reply input within this message bubble
+            const replyInput = messageBubble.querySelector('.reply-input');
+            if (!replyInput) {
+                console.error('Reply input not found');
+                return;
+            }
+
+            const reply = replyInput.value.trim();
+            if (!reply) {
+                alert('Tulis balasan dulu dong!');
+                return;
+            }
+
+            // Find the message in our data
+            const message = this.manager.messages.find(m => (m.key || m.timestamp) === messageId);
+            if (!message) {
+                console.error('Message not found in data');
+                return;
+            }
+
+            // Save the reply
+            await this.manager.replyToMessage(messageId, reply);
+            
+            // Clear the input
+            replyInput.value = '';
+            
+            // Show success feedback
+            alert('Balasan terkirim! ✨');
+        } catch (error) {
+            console.error('Error replying to message:', error);
+            alert('Gagal mengirim balasan. Coba lagi ya!');
+        }
     }
 
-    deleteMessage(messageId) {
-        if (!confirm('Yakin mau hapus pesan ini?')) return;
-        this.manager.deleteMessage(messageId);
+    async deleteMessage(messageId) {
+        try {
+            if (!confirm('Yakin mau hapus pesan ini?')) return;
+            
+            await this.manager.deleteMessage(messageId);
+            alert('Pesan berhasil dihapus! ✨');
+        } catch (error) {
+            console.error('Error deleting message:', error);
+            alert('Gagal menghapus pesan. Coba lagi ya!');
+        }
     }
 
     // Add to your CSS in index.html
