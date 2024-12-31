@@ -15,7 +15,12 @@ class MessagesManager {
         const messagesRef = ref(database, 'messages');
         onValue(messagesRef, (snapshot) => {
             const data = snapshot.val();
-            this.messages = data ? Object.values(data).sort((a, b) => b.timestamp - a.timestamp) : [];
+            // Convert object to array with keys
+            this.messages = data ? Object.entries(data).map(([key, value]) => ({
+                ...value,
+                key
+            })).sort((a, b) => b.timestamp - a.timestamp) : [];
+            
             if (window.messageUI) {
                 window.messageUI.updateMessageCount();
                 if (window.messageUI.isMessagesVisible) {
@@ -120,24 +125,56 @@ class MessageUI {
         this.setupEventListeners();
         this.updateMessageCount();
         this.startAutoUpdate();
-        this.checkAdminHash();
+        this.checkAdminStatus();
         this.addStyles();
+        this.setupAdminShortcut();
         // Make messageUI globally accessible
         window.messageUI = this;
     }
 
-    checkAdminHash() {
-        // Check if the URL hash contains the admin code
-        const hash = window.location.hash;
-        const adminCode = 'admin123'; // Change this to your desired admin code
+    setupAdminShortcut() {
+        let keys = {};
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            // Press 'A' + 'L' together to toggle admin mode
+            if (keys['a'] && keys['l']) {
+                if (!this.isAdmin) {
+                    this.isAdmin = true;
+                    localStorage.setItem('adminData', JSON.stringify({
+                        timestamp: Date.now(),
+                        level: 'Full Access'
+                    }));
+                    this.displayMessages();
+                    alert('Admin mode activated! 👑✨');
+                } else {
+                    this.exitAdmin();
+                }
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            delete keys[e.key];
+        });
+    }
+
+    checkAdminStatus() {
+        // Check if admin code is stored and still valid (24 hours)
+        const adminData = JSON.parse(localStorage.getItem('adminData') || '{}');
+        const now = Date.now();
         
-        if (hash === '#' + adminCode) {
+        if (adminData.timestamp && (now - adminData.timestamp) < 24 * 60 * 60 * 1000) {
             this.isAdmin = true;
-            // Remove the admin code from URL
-            history.pushState("", document.title, window.location.pathname + window.location.search);
         } else {
             this.isAdmin = false;
+            localStorage.removeItem('adminData');
         }
+    }
+
+    exitAdmin() {
+        this.isAdmin = false;
+        localStorage.removeItem('adminData');
+        this.displayMessages();
+        alert('Admin mode deactivated! 👋');
     }
 
     setupElements() {
@@ -147,8 +184,20 @@ class MessageUI {
         this.noMessages = document.querySelector('.no-messages');
         this.loadMoreButton = document.createElement('div');
         this.loadMoreButton.className = 'load-more-messages';
-        this.loadMoreButton.innerHTML = 'Load More Messages';
+        this.loadMoreButton.innerHTML = 'Tampilkan Lebih Banyak';
         this.loadMoreButton.style.display = 'none';
+
+        // Add admin status indicator
+        this.adminIndicator = document.createElement('div');
+        this.adminIndicator.className = 'admin-indicator';
+        this.adminIndicator.innerHTML = `
+            <div class="admin-status">
+                ${this.isAdmin ? '👑 Admin Mode' : ''}
+            </div>
+        `;
+        if (this.floatingMessages) {
+            this.floatingMessages.appendChild(this.adminIndicator);
+        }
     }
 
     setupEventListeners() {
@@ -298,24 +347,28 @@ class MessageUI {
     addStyles() {
         const style = document.createElement('style');
         style.textContent = `
-            .admin-login {
+            .admin-indicator {
                 position: sticky;
                 top: 0;
-                background: var(--accent-color);
-                color: #000;
-                padding: 8px 15px;
-                border-radius: 8px;
+                background: var(--modal-bg);
+                padding: 10px;
+                border-radius: 10px;
                 margin-bottom: 15px;
-                cursor: pointer;
-                font-weight: bold;
-                text-align: center;
-                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
                 z-index: 2;
+                text-align: center;
+                font-weight: bold;
+                color: var(--accent-color);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 5px;
+                transition: all 0.3s ease;
             }
 
-            .admin-login:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(246, 178, 47, 0.3);
+            .admin-indicator:empty {
+                display: none;
             }
 
             .message-bubble {
@@ -326,6 +379,31 @@ class MessageUI {
                 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
                 backdrop-filter: blur(10px);
                 transition: all 0.3s ease;
+            }
+
+            .admin-status {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 14px;
+                font-weight: bold;
+                color: var(--text-color);
+            }
+
+            .admin-status button {
+                background: var(--accent-color);
+                color: #000;
+                border: none;
+                padding: 8px 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: all 0.3s ease;
+            }
+
+            .admin-status button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(246, 178, 47, 0.3);
             }
 
             .message-header {

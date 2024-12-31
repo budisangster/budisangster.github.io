@@ -321,12 +321,16 @@
         const body = document.body;
         const icon = themeToggle.querySelector('i');
 
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            body.classList.add(savedTheme);
-            icon.classList.toggle('fa-sun', savedTheme === 'light');
-            icon.classList.toggle('fa-moon', savedTheme === 'dark');
+        // Load saved theme or default to light
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+        } else {
+            body.classList.remove('dark');
+            icon.classList.add('fa-sun');
+            icon.classList.remove('fa-moon');
         }
 
         themeToggle.addEventListener('click', () => {
