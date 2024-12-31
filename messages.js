@@ -134,10 +134,26 @@ class MessageUI {
 
     setupAdminShortcut() {
         let keys = {};
+        let lastKeyTime = 0;
+        const KEY_TIMEOUT = 500; // 500ms timeout for key combination
+
         document.addEventListener('keydown', (e) => {
-            keys[e.key] = true;
-            // Press 'A' + 'L' together to toggle admin mode
-            if (keys['a'] && keys['l']) {
+            const currentTime = Date.now();
+            
+            // Reset keys if too much time has passed
+            if (currentTime - lastKeyTime > KEY_TIMEOUT) {
+                keys = {};
+            }
+            lastKeyTime = currentTime;
+
+            // Store the key state
+            keys[e.key.toLowerCase()] = true;
+
+            // Only trigger if both 'a' and 'l' are pressed together
+            // and we're not in a text input
+            if (keys['a'] && keys['l'] && 
+                !(document.activeElement.tagName === 'INPUT' || 
+                  document.activeElement.tagName === 'TEXTAREA')) {
                 if (!this.isAdmin) {
                     this.isAdmin = true;
                     localStorage.setItem('adminData', JSON.stringify({
@@ -149,11 +165,19 @@ class MessageUI {
                 } else {
                     this.exitAdmin();
                 }
+                // Prevent default to avoid typing 'al'
+                e.preventDefault();
             }
         });
 
         document.addEventListener('keyup', (e) => {
-            delete keys[e.key];
+            // Remove the released key from tracking
+            delete keys[e.key.toLowerCase()];
+        });
+
+        // Clear keys when window loses focus
+        window.addEventListener('blur', () => {
+            keys = {};
         });
     }
 
