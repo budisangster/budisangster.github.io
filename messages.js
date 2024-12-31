@@ -120,21 +120,42 @@ class MessageUI {
         this.setupEventListeners();
         this.updateMessageCount();
         this.startAutoUpdate();
-        this.checkShowMessages();
-        this.isAdmin = false; // Set this to true when admin is logged in
+        this.checkAdmin();
         this.addStyles();
         // Make messageUI globally accessible
         window.messageUI = this;
     }
 
-    checkShowMessages() {
-        const shouldShow = localStorage.getItem('showMessages');
-        if (shouldShow === 'true' && !this.isMessagesVisible) {
-            setTimeout(() => {
-                this.toggleMessages();
-                localStorage.removeItem('showMessages');
-            }, 500);
+    checkAdmin() {
+        // Check if admin password is stored
+        const storedHash = localStorage.getItem('adminHash');
+        if (!storedHash) {
+            this.isAdmin = false;
+            return;
         }
+
+        // Verify the stored hash
+        const correctHash = 'f4c3b00k'; // Replace with your actual hash
+        this.isAdmin = storedHash === correctHash;
+    }
+
+    async login(password) {
+        // Simple hash for demo (replace with proper hashing in production)
+        const correctHash = 'f4c3b00k'; // Replace with your actual hash
+        
+        if (password === correctHash) {
+            localStorage.setItem('adminHash', correctHash);
+            this.isAdmin = true;
+            this.displayMessages(); // Refresh messages to show admin controls
+            return true;
+        }
+        return false;
+    }
+
+    logout() {
+        localStorage.removeItem('adminHash');
+        this.isAdmin = false;
+        this.displayMessages(); // Refresh messages to hide admin controls
     }
 
     setupElements() {
@@ -146,6 +167,27 @@ class MessageUI {
         this.loadMoreButton.className = 'load-more-messages';
         this.loadMoreButton.innerHTML = 'Load More Messages';
         this.loadMoreButton.style.display = 'none';
+
+        // Add admin login button
+        this.adminButton = document.createElement('div');
+        this.adminButton.className = 'admin-login';
+        this.adminButton.innerHTML = this.isAdmin ? 'Logout' : 'Admin Login';
+        this.adminButton.onclick = () => this.handleAdminClick();
+        this.floatingMessages.appendChild(this.adminButton);
+    }
+
+    handleAdminClick() {
+        if (this.isAdmin) {
+            this.logout();
+            this.adminButton.innerHTML = 'Admin Login';
+        } else {
+            const password = prompt('Enter admin password:');
+            if (password && this.login(password)) {
+                this.adminButton.innerHTML = 'Logout';
+            } else {
+                alert('Invalid password');
+            }
+        }
     }
 
     setupEventListeners() {
@@ -161,51 +203,15 @@ class MessageUI {
                 this.toggleMessages();
             }
         });
-
-        // Listen for storage changes
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'messages' || e.key === 'showMessages') {
-                this.manager.messages = this.manager.loadFromLocalStorage() || [];
-                this.updateMessageCount();
-                if (this.isMessagesVisible) {
-                    this.displayMessages();
-                }
-                if (e.key === 'showMessages' && e.newValue === 'true') {
-                    this.toggleMessages();
-                    localStorage.removeItem('showMessages');
-                }
-            }
-        });
     }
 
     startAutoUpdate() {
-        // Check for new messages every 5 seconds
-        setInterval(() => {
-            if (this.manager.hasNewMessages()) {
-                this.updateMessageCount();
-                if (this.isMessagesVisible) {
-                    this.displayMessages();
-                } else {
-                    this.showNewMessageNotification();
-                }
-            }
-        }, 5000);
-
         // Update message times every minute
         setInterval(() => {
             if (this.isMessagesVisible) {
                 this.displayMessages();
             }
         }, 60000);
-    }
-
-    handleNewMessage(messageData) {
-        this.manager.messages = this.manager.loadFromLocalStorage() || [];
-        this.updateMessageCount();
-        this.showNewMessageNotification();
-        if (this.isMessagesVisible) {
-            this.displayMessages();
-        }
     }
 
     showNewMessageNotification() {
@@ -300,6 +306,26 @@ class MessageUI {
     addStyles() {
         const style = document.createElement('style');
         style.textContent = `
+            .admin-login {
+                position: sticky;
+                top: 0;
+                background: var(--accent-color);
+                color: #000;
+                padding: 8px 15px;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                cursor: pointer;
+                font-weight: bold;
+                text-align: center;
+                transition: all 0.3s ease;
+                z-index: 2;
+            }
+
+            .admin-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(246, 178, 47, 0.3);
+            }
+
             .message-bubble {
                 background: var(--modal-bg);
                 padding: 20px;
