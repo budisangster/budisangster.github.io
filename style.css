@@ -93,6 +93,7 @@ body {
     height: 2px;
     background: #f6b22f;
     transition: all 0.3s ease;
+    will-change: transform, opacity;
 }
 
 /* Mobile navigation */
@@ -158,6 +159,7 @@ body {
 /* Updated Hero Styles */
 .hero {
     height: 70vh;
+    min-height: 500px;
     position: relative;
     display: flex;
     align-items: center;
@@ -279,6 +281,7 @@ body {
     overflow: hidden;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 300px;
 }
 
 .gallery-item img {
@@ -286,6 +289,8 @@ body {
     height: 100%;
     object-fit: cover;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    loading: lazy;
+    decoding: async;
 }
 
 .gallery-item:hover img {
@@ -311,6 +316,7 @@ body {
 .gallery-item:hover {
     transform: translateY(-8px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    will-change: transform;
 }
 
 .overlay h3 {
@@ -410,6 +416,8 @@ body {
     height: auto;
     object-fit: contain;
     max-height: 80vh;
+    loading: lazy;
+    decoding: async;
 }
 
 @media (max-width: 768px) {
@@ -877,4 +885,17 @@ body {
     .countdown-item .label {
         font-size: 10px;
     }
+} 
+
+/* Optimize animations for compositing */
+.gallery-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    will-change: transform;
+}
+
+/* Optimize font loading */
+@font-face {
+    font-family: 'Arial';
+    font-display: swap;
 } 
