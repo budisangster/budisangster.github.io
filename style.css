@@ -167,6 +167,7 @@ body {
     overflow: hidden;
     background: var(--bg-color);
     transition: background-color 0.3s ease;
+    contain: layout paint;
 }
 
 .hero-background {
@@ -192,16 +193,22 @@ body {
     position: relative;
     z-index: 2;
     text-align: center;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 20px;
+    contain: layout style;
 }
 
 .logo-container {
     position: relative;
     overflow: visible;
     padding: 10px;
-    width: 100vw;
+    width: 100%;
+    height: 150px; /* Fixed height to prevent layout shift */
     display: flex;
     justify-content: center;
     align-items: center;
+    contain: layout size;
 }
 
 .hero-logo {
@@ -218,9 +225,8 @@ body {
     justify-content: center;
     gap: 15px;
     color: var(--text-color);
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease forwards 0.3s;
+    height: 30px; /* Fixed height for text */
+    contain: layout style;
 }
 
 .separator {
@@ -228,6 +234,10 @@ body {
 }
 
 @keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
     to {
         opacity: 1;
         transform: translateY(0);
@@ -264,15 +274,18 @@ body {
 /* Gallery */
 .work-gallery {
     padding: 40px 20px;
+    min-height: calc(100vh - 100px); /* Reserve space for gallery */
+    contain: layout paint;
 }
 
 .gallery-container {
     max-width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    padding: 0;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 20px;
+    contain: layout style;
 }
 
 .gallery-item {
@@ -280,8 +293,10 @@ body {
     aspect-ratio: 1/1;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 300px;
+    background: var(--modal-bg); /* Placeholder color while image loads */
+    contain: layout size;
 }
 
 .gallery-item img {
@@ -291,26 +306,31 @@ body {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     loading: lazy;
     decoding: async;
+    background: var(--modal-bg);
+    contain: layout size;
 }
 
 .gallery-item:hover img {
     transform: scale(1.05);
 }
 
+/* Prevent layout shift for overlay */
 .overlay {
     position: absolute;
-    bottom: -100%;
+    bottom: 0;
     left: 0;
     width: 100%;
     padding: 20px;
     background: var(--overlay-bg);
     backdrop-filter: blur(5px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
+    contain: layout paint;
 }
 
 .gallery-item:hover .overlay {
-    bottom: 0;
+    transform: translateY(0);
 }
 
 .gallery-item:hover {
@@ -349,6 +369,8 @@ body {
     opacity: 0;
     transform: translateY(20px);
     animation: fadeIn 0.8s ease forwards;
+    will-change: opacity, transform;
+    contain: layout style;
 }
 
 @keyframes fadeIn {
@@ -372,7 +394,11 @@ body {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 20px;
     }
-} 
+    
+    .gallery-item {
+        min-height: 250px;
+    }
+}
 
 /* Simplified modal styles */
 .detail-modal {
@@ -548,12 +574,14 @@ body {
     font-weight: bold;
     position: relative;
     color: transparent;
-    height: auto;
-    min-height: 120px;
+    height: 120px; /* Fixed height */
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: -30px;
+    contain: layout size;
 }
 
 /* Doge */
@@ -569,6 +597,8 @@ body {
     transform: translateY(-50%) rotate(-15deg);
     z-index: 2;
     animation: dogeDash 6s infinite;
+    contain: layout paint;
+    will-change: transform;
 }
 
 /* Anime slash effect */
@@ -657,13 +687,13 @@ body {
 
 @keyframes dogeDash {
     0%, 30% { 
-        left: calc(-50vw - 120px); /* Start from viewport edge */
+        transform: translate(calc(-50vw - 120px), -50%) rotate(-15deg);
     }
     35% { 
-        left: calc(50vw + 120px); /* End at viewport edge */
+        transform: translate(calc(50vw + 120px), -50%) rotate(-15deg);
     }
     36%, 100% { 
-        left: calc(-50vw - 120px);
+        transform: translate(calc(-50vw - 120px), -50%) rotate(-15deg);
     }
 }
 
@@ -718,26 +748,25 @@ body {
 @media (max-width: 768px) {
     .hero {
         height: 60vh;
-    }
-    .arabic-logo {
-        font-size: 70px;
-        min-height: 90px;
-        margin-top: -20px;
-    }
-    .arabic-logo::before,
-    .arabic-logo::after {
-        height: 70px;
-    }
-    .arabic-logo .subtitle {
-        font-size: 24px;
+        min-height: 400px;
     }
     
     .logo-container {
-        padding: 20px 10px;
-        min-height: 150px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        height: 120px;
+    }
+    
+    .arabic-logo {
+        font-size: 70px;
+        height: 90px;
+    }
+    
+    .hero-subtitle {
+        font-size: 12px;
+        letter-spacing: 3px;
+        flex-wrap: wrap;
+        padding: 0 20px;
+        height: auto;
+        min-height: 40px;
     }
 } 
 
