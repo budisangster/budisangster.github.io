@@ -270,28 +270,49 @@ section h2 {
 /* Portfolio section */
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 30px;
     margin-top: 20px;
+    width: 100%;
 }
 
 .portfolio-item {
-    height: 200px;
+    height: 280px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 2px solid #2a2a2a;
+    border: 3px solid #2a2a2a;
     color: #2a2a2a;
-    font-size: 1.5em;
+    font-size: 1.8em;
     font-weight: bold;
     text-transform: lowercase;
     transition: all 0.3s ease;
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    text-align: center;
+    padding: 25px;
+    gap: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.portfolio-thumbnail {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
 }
 
 .portfolio-item:hover {
     background-color: rgba(42, 42, 42, 0.1);
-    transform: scale(1.02);
+    transform: scale(1.03);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.portfolio-item:hover .portfolio-thumbnail {
+    transform: scale(1.1);
 }
 
 /* Contact section */
@@ -325,8 +346,15 @@ section h2 {
     }
 
     .portfolio-item:hover {
-        background-color: rgba(42, 42, 42, 0.1);
-        transform: scale(1.02);
+        background-color: rgba(42, 42, 42, 0.15);
+        transform: scale(1.03);
+        color: #2a2a2a;
+        text-decoration: none;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .portfolio-item:hover .portfolio-thumbnail {
+        transform: scale(1.1);
     }
 
     .icon:hover {
@@ -341,8 +369,15 @@ section h2 {
     }
 
     .portfolio-item:active {
-        background-color: rgba(42, 42, 42, 0.2);
+        background-color: rgba(42, 42, 42, 0.25);
         transform: scale(0.98);
+        color: #2a2a2a;
+        text-decoration: none;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .portfolio-item:active .portfolio-thumbnail {
+        transform: scale(0.95);
     }
 
     .icon:active {
@@ -371,14 +406,22 @@ section h2 {
     }
 
     .portfolio-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
+        grid-template-columns: 1fr;
+        gap: 20px;
         padding: 0 15px;
     }
 
     .portfolio-item {
-        height: 130px;
-        font-size: 1em;
+        height: 220px;
+        font-size: 1.5em;
+        padding: 20px;
+        gap: 15px;
+    }
+    
+    .portfolio-thumbnail {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 5px;
     }
 
     .social {
@@ -441,8 +484,16 @@ section h2 {
     }
 
     .portfolio-item {
-        height: 100px;
-        font-size: 0.9em;
+        height: 180px;
+        font-size: 1.2em;
+        padding: 15px;
+        gap: 10px;
+    }
+    
+    .portfolio-thumbnail {
+        width: 70px;
+        height: 70px;
+        margin-bottom: 3px;
     }
 
     .background-gif {
